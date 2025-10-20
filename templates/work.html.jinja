@@ -1,0 +1,10 @@
+<section>
+    <h2>work</h2>
+    {% for page in work.values() %}
+    <h3>{{page.title}} at {{page.company}}
+    </h3>
+    <h4>{{page.begin}} to {{page.end}}</h4>
+    {{page.description}}
+    <hr>
+    {% endfor %}
+</section>
