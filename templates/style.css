@@ -1,7 +1,6 @@
 body {
     color: white;
     background-color: black;
-    text-align: center;
 
 }
 
@@ -10,5 +9,6 @@ a {
 }
 
 header {
+    text-align: center;
     background-color: blue;
 }
