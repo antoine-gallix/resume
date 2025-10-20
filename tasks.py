@@ -9,7 +9,7 @@ from build import render_resume
 @task
 def build(context):
     pathlib.Path(config.BUILD_DIR).mkdir(exist_ok=True)
-    render_resume("resume.html", "resume.html")
+    render_resume("resume.html.jinja", "resume.html")
     context.run(f"cp {config.TEMPLATE_DIR}/style.css {config.BUILD_DIR}/style.css")
 
 
