@@ -3,7 +3,6 @@ from functools import reduce
 from operator import or_
 from pathlib import Path
 
-from icecream import ic
 from jinja2 import Environment, FileSystemLoader
 
 import config
@@ -31,7 +30,6 @@ def render_resume(template_name, output_name):
     env = Environment(loader=FileSystemLoader(config.TEMPLATE_DIR))
     template = env.get_template(template_name)
     data = read_data(Path(config.DATA_DIR))
-    ic(data)
     output = template.render(**data)
     output_file = Path(config.BUILD_DIR) / output_name
     output_file.write_text(output)
