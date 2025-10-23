@@ -7,12 +7,19 @@ from pathlib import Path
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
 
+# ------------------------ config ------------------------
+
+
 TEMPLATE_DIR = "templates"
 BUILD_DIR = "output"
 DATA_DIR = "data"
 
+HTML_NAME = "index.html"
+STYLE_NAME = "style.css"
+
 
 def read_data(path: Path, first_call=True) -> dict:
+    """Read a toml file, or a nested directory of files"""
     if path.is_file():
         return {path.stem: tomllib.loads(path.read_text())}
     elif path.is_dir():
@@ -43,13 +50,13 @@ def build(context):
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     data = read_data(Path(DATA_DIR))
 
-    html_template = env.get_template("resume.html.jinja")
+    html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
-    write(html_output, "resume.html.jinja")
+    write(html_output, HTML_NAME)
 
-    css_template = env.get_template("style.css.jinja")
+    css_template = env.get_template(f"{STYLE_NAME}.jinja")
     css_output = css_template.render()
-    write(css_output, "style.css")
+    write(css_output, STYLE_NAME)
 
     print("resume generated successfully")
 
