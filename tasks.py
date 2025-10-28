@@ -7,12 +7,12 @@ from pathlib import Path
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
 
+from config import settings
+
 # ------------------------ config ------------------------
 
 
 TEMPLATE_DIR = "templates"
-BUILD_DIR = "output"
-DATA_DIR = "data"
 
 HTML_NAME = "index.html"
 STYLE_NAME = "style.css"
@@ -37,18 +37,18 @@ def read_data(path: Path, first_call=True) -> dict:
 
 
 def write(content, name):
-    output_file = Path(BUILD_DIR) / name
+    output_file = Path(settings.BUILD_DIR).expanduser() / name
     output_file.write_text(content)
-    print(f"file written: {name}")
+    print(f"file written: {output_file}")
 
 
 @task
 def build(context):
-    pathlib.Path(BUILD_DIR).mkdir(exist_ok=True)
+    pathlib.Path(settings.BUILD_DIR).mkdir(exist_ok=True)
     print("build resume from templates")
 
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    data = read_data(Path(DATA_DIR))
+    data = read_data(Path(settings.DATA_DIR))
 
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
@@ -70,4 +70,4 @@ def autobuild(context):
 def serve(context):
     url = "localhost:35729/resume.html"
     print(f"output served at {url}")
-    context.run(f"livereload {BUILD_DIR}")
+    context.run(f"livereload {settings.BUILD_DIR}")
