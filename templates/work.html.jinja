@@ -1,6 +1,6 @@
 <section>
-    <h2>work</h2>
-    {% for page in work.values() %}
+    <h2>Work</h2>
+    {% for page in work.values()|sort(attribute=begin) %}
     <h3>{{page.title}} at {{page.company}}
     </h3>
     <h4>{{page.begin}} to {{page.end}}</h4>
