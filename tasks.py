@@ -44,11 +44,11 @@ def write(content, name):
 
 @task
 def build(context):
-    pathlib.Path(settings.BUILD_DIR).mkdir(exist_ok=True)
+    pathlib.Path(settings.BUILD_DIR).expanduser().mkdir(exist_ok=True, parents=True)
     print("build resume from templates")
 
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    data = read_data(Path(settings.DATA_DIR))
+    data = read_data(Path(settings.DATA_DIR).expanduser())
 
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
