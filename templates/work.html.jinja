@@ -1,10 +1,11 @@
 <section>
     <h2>Work</h2>
     {% for page in work.values()|sort(attribute=begin) %}
-    <h3>{{page.title}} at {{page.company}}
-    </h3>
-    <h4>{{page.begin}} to {{page.end}}</h4>
-    {{page.description}}
+    <div class="spread">
+        <h3>{{page.title}} at {{page.company}}</h3>
+        <h4>{{page.begin}} to {{page.end}}</h4>
+    </div>
+    <p>{{page.description}}</p>
     <hr>
     {% endfor %}
 </section>
