@@ -1,10 +1,48 @@
 <header>
     <h1>{{about.name}}</h1>
 </header>
+
 <main>
-    {% include "about.html.jinja" %}
-    {% include "links.html.jinja" %}
-    {% include "work.html.jinja" %}
-    {% include "skills.html.jinja" %}
-    {% include "training.html.jinja" %}
+    <section>
+        <h2>About me</h2>
+        {{about.intro}}
+    </section>
+
+    <section>
+        <h2>Links</h2>
+        <ul>
+            <li>Email: <a href=mailto:{{about.email}}>{{about.email}}</a></li>
+            <li>Web: <a href={{about.web}}>{{about.web}}</a></li>
+            <li>Github: <a href={{about.github}}>{{about.github}}</a></li>
+            <li>Linkedin: <a href={{about.linkedin}}>{{about.linkedin}}</a></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Work</h2>
+        {% for page in work.values()|sort(attribute=begin) %}
+        <div class="spread">
+            <h3>{{page.title}} at {{page.company}}</h3>
+            <h4>{{page.begin}} to {{page.end}}</h4>
+        </div>
+        <p>{{page.description}}</p>
+        <hr>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>Skills</h2>
+        {% for skill,elements in skills.items()%}
+        <h3>{{skill}}</h3>
+        <ul>
+            {% for element in elements%}
+            <li>{{element}}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>Education and Training</h2>
+    </section>
 </main>
