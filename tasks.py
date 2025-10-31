@@ -14,8 +14,7 @@ from config import settings
 
 TEMPLATE_DIR = "templates"
 
-HTML_NAME = "index.html"
-STYLE_NAME = "style.css"
+HTML_NAME = "resume.html"
 
 
 def read_data(path: Path, first_call=True) -> dict:
@@ -53,10 +52,6 @@ def build(context):
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
     write(html_output, HTML_NAME)
-
-    css_template = env.get_template(f"{STYLE_NAME}.jinja")
-    css_output = css_template.render()
-    write(css_output, STYLE_NAME)
 
     print("resume generated successfully")
 
