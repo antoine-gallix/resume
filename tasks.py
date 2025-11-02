@@ -6,6 +6,7 @@ from pathlib import Path
 
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
+from rich import print
 
 from config import settings
 
@@ -39,6 +40,11 @@ def write(content, name):
     output_file = Path(settings.BUILD_DIR).expanduser() / name
     output_file.write_text(content)
     print(f"file written: {output_file}")
+
+
+@task
+def show_data(context):
+    print(read_data(Path(settings.DATA_DIR).expanduser()))
 
 
 @task
