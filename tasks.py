@@ -114,6 +114,7 @@ def _build():
     write(html_output, HTML_NAME)
 
     for file in STATIC_DIR.iterdir():
+        print(f"copy {file} into {BUILD_DIR}")
         shutil.copy(file, BUILD_DIR)
 
     print("resume generated successfully")
@@ -127,19 +128,22 @@ def build(context):
 @task
 def autobuild(context):
     watcher = Watcher(targets=[STATIC_DIR, TEMPLATE_DIR], callback=_build)
+    _build()
     watcher.watch()
 
 
 @task
 def serve(context):
-    print(f"output served at {URL}")
     from livereload import Server
 
     server = Server()
     # prevent caching
     server.setHeader("Cache-Control", "no-store")
     for ext in ["html", "css", "png"]:
-        server.watch(str(BUILD_DIR / f"*.{ext}"))
+        path = str(BUILD_DIR / f"*.{ext}")
+        print(f"watching {path}")
+        server.watch(path)
+    print(f"serving build content at {URL}")
     server.serve(root=BUILD_DIR, port=SERVER_PORT, host=SERVER_HOST)
 
 
