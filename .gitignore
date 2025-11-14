@@ -4,3 +4,4 @@ __pycache__
 dev.py
 # Ignore dynaconf secret files
 .secrets.*
+*.code-workspace
