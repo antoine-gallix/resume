@@ -12,7 +12,73 @@
 </head>
 
 <body>
-    {% include "body.html.jinja" %}
+    <header>
+        <h1>{{about.name}}</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2 class="section-title">About me</h2>
+            <p>{{about.intro}}</p>
+        </section>
+        <section>
+            <h2 class="section-title">Links</h2>
+            <ul>
+                <li>Email: <a href=mailto:{{about.email}}>{{about.email}}</a></li>
+                <li>Web: <a href={{about.web}}>{{about.web}}</a></li>
+                <li>Github: <a href={{about.github}}>{{about.github}}</a></li>
+                <li>Linkedin: <a href={{about.linkedin}}>{{about.linkedin}}</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="section-title">Work</h2>
+            <div>
+                {% for period in work.values()|sort(attribute="begin",reverse=True) %}
+                <h3 class="job-head-1st-line">{{period.title}}</h3>
+                <div class="job-head-2nd-line">
+                    <div class="company">{{period.company}}</div>
+                    <div class="timerange">{{period.begin}} to {{period.end}}</div>
+                </div>
+                <p>{{period.description | markdown | safe}}</p>
+                <hr>
+                {% endfor %}
+            </div>
+        </section>
+        <section>
+            <h2 class="section-title">Training</h2>
+            <div>
+                {% for period in training.values()|sort(attribute="begin",reverse=True) %}
+                <h3 class="job-head-1st-line">{{period.path}}</h3>
+                <div class="job-head-2nd-line">
+                    <div class="company">{{period.institution}}</div>
+                    <div class="timerange">{{period.begin}} to {{period.end}}</div>
+                </div>
+                <p>{{period.description | markdown | safe}}</p>
+                <hr>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h2>Skills</h2>
+            {% for skill,elements in skills.items()%}
+            <h3>{{skill}}</h3>
+            <ul>
+                {% for element in elements%}
+                <li>{{element}}</li>
+                {% endfor %}
+            </ul>
+            {% endfor %}
+        </section>
+    </main>
+
+    <footer>
+        <p>This page is created with my home-made <a href="{{about.source}}">generator</a>, with python, jinja templates
+            and
+            simplecss
+        </p>
+    </footer>
 </body>
 
 </html>
