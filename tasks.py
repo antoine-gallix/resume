@@ -8,6 +8,7 @@ from operator import or_
 from pathlib import Path
 from typing import Callable
 
+import markdown
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
 from rich import print
@@ -25,14 +26,14 @@ SERVER_PORT = 35729
 # ---
 
 
-def resolved_path(path: str):
+def resolved_path(path: str) -> Path:
     return Path(path).expanduser()
 
 
-STATIC_DIR = resolved_path(STATIC_DIR)
-TEMPLATE_DIR = resolved_path(TEMPLATE_DIR)
-DATA_DIR = resolved_path(settings.DATA_DIR)
-BUILD_DIR = resolved_path(settings.BUILD_DIR)
+static_dir: Path = resolved_path(STATIC_DIR)
+template_dir: Path = resolved_path(TEMPLATE_DIR)
+data_dir = resolved_path(settings.DATA_DIR)
+build_dir = resolved_path(settings.BUILD_DIR)
 URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 
 # ---
@@ -86,7 +87,7 @@ def read_data(path: Path, first_call=True) -> dict:
 
 
 def write(content, name):
-    output_file = BUILD_DIR / name
+    output_file = build_dir / name
     output_file.write_text(content)
     print(f"file written: {output_file}")
 
@@ -96,40 +97,43 @@ def write(content, name):
 
 @task
 def show_data(context):
-    data = read_data(DATA_DIR)
+    data = read_data(data_dir)
     json_data = json.dumps(data, indent=4)
     print(json_data)
 
 
 def _build():
-    BUILD_DIR.mkdir(exist_ok=True, parents=True)
+    build_dir.mkdir(exist_ok=True, parents=True)
 
     print("build resume from templates")
 
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
-    data = read_data(DATA_DIR)
+    env = Environment(loader=FileSystemLoader(template_dir))
+    env.filters["markdown"] = lambda text: markdown.markdown(text)
+    data = read_data(data_dir)
 
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
     write(html_output, HTML_NAME)
 
-    for file in STATIC_DIR.iterdir():
-        print(f"copy {file} into {BUILD_DIR}")
-        shutil.copy(file, BUILD_DIR)
+    for file in static_dir.iterdir():
+        print(f"copy {file} into {build_dir}")
+        shutil.copy(file, build_dir)
 
     print("resume generated successfully")
 
 
-@task
-def build(context):
-    _build()
-
-
-@task
-def autobuild(context):
-    watcher = Watcher(targets=[STATIC_DIR, TEMPLATE_DIR], callback=_build)
+def _autobuild():
+    watcher = Watcher(targets=[static_dir, template_dir], callback=_build)
     _build()
     watcher.watch()
+
+
+@task
+def build(context, auto=False):
+    if auto:
+        _autobuild()
+    else:
+        _build()
 
 
 @task
@@ -139,12 +143,12 @@ def serve(context):
     server = Server()
     # prevent caching
     server.setHeader("Cache-Control", "no-store")
-    for ext in ["html", "css", "png"]:
-        path = str(BUILD_DIR / f"*.{ext}")
-        print(f"watching {path}")
-        server.watch(path)
+    # for ext in ["html", "css", "png"]:
+    #     server.watch(f"*.{ext}")
     print(f"serving build content at {URL}")
-    server.serve(root=BUILD_DIR, port=SERVER_PORT, host=SERVER_HOST)
+    server.serve(
+        root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
+    )
 
 
 @task
