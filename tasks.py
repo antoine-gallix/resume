@@ -11,6 +11,7 @@ from typing import Callable
 import markdown
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
+from livereload import Server
 from rich import print
 
 from config import settings
@@ -123,7 +124,7 @@ def _build():
 
 
 def _autobuild():
-    watcher = Watcher(targets=[static_dir, template_dir], callback=_build)
+    watcher = Watcher(targets=[static_dir, template_dir, data_dir], callback=_build)
     _build()
     watcher.watch()
 
@@ -138,13 +139,9 @@ def build(context, auto=False):
 
 @task
 def serve(context):
-    from livereload import Server
-
     server = Server()
-    # prevent caching
-    server.setHeader("Cache-Control", "no-store")
-    # for ext in ["html", "css", "png"]:
-    #     server.watch(f"*.{ext}")
+    server.setHeader("Cache-Control", "no-store")  # prevent caching
+    server.watch(build_dir)
     print(f"serving build content at {URL}")
     server.serve(
         root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
