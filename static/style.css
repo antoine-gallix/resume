@@ -4,6 +4,18 @@ section {
     justify-items: space-between;
 }
 
+.about {
+    display: flex;
+}
+
+p {
+    text-align: justify;
+}
+
+.picture {
+    align-self: center;
+}
+
 /* .section-title {
     font-size: 2rem;
 } */
