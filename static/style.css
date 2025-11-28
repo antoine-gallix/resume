@@ -16,12 +16,7 @@ p {
     align-self: center;
 }
 
-/* .section-title {
-    font-size: 2rem;
-} */
-
-
-.job-head-2nd-line {
+.job-attributes {
     display: flex;
     gap: 1rem;
     font-size: large;
