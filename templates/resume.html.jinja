@@ -16,12 +16,19 @@
         <h1>{{about.name}}</h1>
     </header>
 
+
     <main>
+
+        {# ------------------------ ABOUT ------------------------ #}
+
         <section class="about">
             <h2 class="section-title">About me</h2>
             <p>{{about.intro}}</p>
             <img src="{{about.picture}}" alt="{{about.name}}" class="picture">
         </section>
+
+        {# ------------------------ LINKS ------------------------ #}
+
         <section>
             <h2 class="section-title">Links</h2>
             <ul>
@@ -31,6 +38,9 @@
                 <li>Linkedin: <a href={{about.linkedin}}>{{about.linkedin}}</a></li>
             </ul>
         </section>
+
+        {# ------------------------ WORK ------------------------ #}
+
 
         <section>
             <h2 class="section-title">Work</h2>
@@ -42,10 +52,19 @@
                     <div class="timerange">{{period.begin}} to {{period.end}}</div>
                 </div>
                 <p>{{period.description | markdown | safe}}</p>
+                {% for skill_it in period.skills %}
+                {{skill_it}}
+                {% endfor %}
+                {% for tech_it in period.tech %}
+                {{tech_it}}
+                {% endfor %}
                 <hr>
                 {% endfor %}
             </div>
         </section>
+
+        {# ------------------------ TRAINING ------------------------ #}
+
         <section>
             <h2 class="section-title">Training</h2>
             <div>
@@ -60,24 +79,13 @@
                 {% endfor %}
             </div>
         </section>
-
-        <section>
-            <h2>Skills</h2>
-            {% for skill,elements in skills.items()%}
-            <h3>{{skill}}</h3>
-            <ul>
-                {% for element in elements%}
-                <li>{{element}}</li>
-                {% endfor %}
-            </ul>
-            {% endfor %}
-        </section>
     </main>
+
+    {# ------------------------ FOOTER ------------------------ #}
 
     <footer>
         <p>This page is created with my home-made <a href="{{about.source}}">generator</a>, with python, jinja templates
-            and
-            simplecss
+            and simplecss
         </p>
     </footer>
 </body>
