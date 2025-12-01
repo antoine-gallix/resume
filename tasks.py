@@ -8,7 +8,7 @@ from etabli.watcher import Watcher
 from invoke import task  # type:ignore
 from jinja2 import Environment, FileSystemLoader
 from livereload import Server
-from rich import print
+from loguru import logger
 
 from config import settings
 
@@ -30,7 +30,7 @@ def resolved_path(path: str) -> Path:
 def write(content, name):
     output_file = build_dir / name
     output_file.write_text(content)
-    print(f"file written: {output_file}")
+    logger.info(f"file written: {output_file}")
 
 
 # ---
@@ -55,7 +55,7 @@ def show_data(context):
 def _build():
     build_dir.mkdir(exist_ok=True, parents=True)
 
-    print("build resume from templates")
+    logger.info("build resume from templates")
 
     env = Environment(loader=FileSystemLoader(template_dir))
     env.filters["markdown"] = lambda text: markdown.markdown(text)
@@ -66,24 +66,22 @@ def _build():
     write(html_output, HTML_NAME)
 
     for file in static_dir.iterdir():
-        print(f"copy {file} into {build_dir}")
+        logger.log(f"copy {file} into {build_dir}")
         shutil.copy(file, build_dir)
 
-    print("resume generated successfully")
-
-
-def _autobuild():
-    watcher = Watcher(targets=[static_dir, template_dir, data_dir], callback=_build)
-    _build()
-    watcher.watch()
+    logger.log("resume generated successfully")
 
 
 @task
-def build(context, auto=False):
-    if auto:
-        _autobuild()
-    else:
-        _build()
+def build(context):
+    _build()
+
+
+@task
+def autobuild(context):
+    watcher = Watcher(targets=[static_dir, template_dir, data_dir], callback=_build)
+    _build()
+    watcher.watch()
 
 
 @task
@@ -91,7 +89,7 @@ def serve(context):
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
     server.watch(build_dir)
-    print(f"serving build content at {URL}")
+    logger.log(f"serving build content at {URL}")
     server.serve(
         root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
     )
