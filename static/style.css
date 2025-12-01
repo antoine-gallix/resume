@@ -21,3 +21,24 @@ p {
     gap: 1rem;
     font-size: large;
 }
+
+.labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
+    list-style: none;
+}
+
+.labels li {
+    border: solid 1px;
+    border-radius: 1em;
+    padding: 0.1em .5em;
+}
+
+.labels li.skill {
+    border-color: aqua;
+}
+
+.labels li.tech {
+    border-color: blueviolet;
+}

@@ -52,12 +52,14 @@
                     <div class="timerange">{{period.begin}} to {{period.end}}</div>
                 </div>
                 <p>{{period.description | markdown | safe}}</p>
-                {% for skill_it in period.skills %}
-                {{skill_it}}
-                {% endfor %}
-                {% for tech_it in period.tech %}
-                {{tech_it}}
-                {% endfor %}
+                <ul class="labels">
+                    {% for skill_it in period.skills %}
+                    <li class="skill">{{skill_it}}</li>
+                    {% endfor %}
+                    {% for tech_it in period.tech %}
+                    <li class="tech">{{tech_it}}</li>
+                    {% endfor %}
+                </ul>
                 <hr>
                 {% endfor %}
             </div>
