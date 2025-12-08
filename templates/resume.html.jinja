@@ -46,7 +46,7 @@
             <h2 class="section-title">Work</h2>
             <div>
                 {% for period in work.values()|sort(attribute="begin",reverse=True) %}
-                <h3 class="job-head-1st-line">{{period.title}}</h3>
+                <h3>{{period.title}}</h3>
                 <div class="job-attributes">
                     <div class="company">{{period.company}}</div>
                     <div class="timerange">{{period.begin}} to {{period.end}}</div>

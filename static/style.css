@@ -1,11 +1,7 @@
 section {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
     justify-items: space-between;
-}
-
-.about {
-    display: flex;
 }
 
 p {
@@ -14,6 +10,16 @@ p {
 
 .picture {
     align-self: center;
+}
+
+/* work heading */
+
+.company {
+    font-size: x-large;
+}
+
+.timerange {
+    font-size: x-large;
 }
 
 .job-attributes {
