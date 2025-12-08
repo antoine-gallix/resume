@@ -66,10 +66,10 @@ def _build():
     write(html_output, HTML_NAME)
 
     for file in static_dir.iterdir():
-        logger.log(f"copy {file} into {build_dir}")
+        logger.info(f"copy {file} into {build_dir}")
         shutil.copy(file, build_dir)
 
-    logger.log("resume generated successfully")
+    logger.info("resume generated successfully")
 
 
 @task
@@ -89,7 +89,7 @@ def serve(context):
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
     server.watch(build_dir)
-    logger.log(f"serving build content at {URL}")
+    logger.info(f"serving build content at {URL}")
     server.serve(
         root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
     )
