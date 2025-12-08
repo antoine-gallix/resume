@@ -96,5 +96,5 @@ def serve(context):
 
 
 @task
-def firefox(context):
-    context.run(f"firefox --new-window {URL}")
+def view(context):
+    context.run(f"firefox --new-window {URL}", disown=True)
