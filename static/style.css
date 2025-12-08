@@ -19,20 +19,22 @@ p {
 .job-attributes {
     display: flex;
     gap: 1rem;
-    font-size: large;
 }
+
+
+/* work labels */
 
 .labels {
     display: flex;
     flex-wrap: wrap;
-    gap: .5em;
+    gap: .5rem;
     list-style: none;
 }
 
 .labels li {
     border: solid 1px;
-    border-radius: 1em;
-    padding: 0.1em .5em;
+    border-radius: 1rem;
+    padding: 0.3rem .5rem 0.2rem;
 }
 
 .labels li.skill {
