@@ -2,6 +2,8 @@ import json
 import shutil
 from pathlib import Path
 
+import arrow
+import humanize
 import markdown
 from etabli.reader import read_toml_data
 from etabli.watcher import Watcher
@@ -45,11 +47,24 @@ URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 # ---
 
 
+def enrich_data(data):
+    for period in data["work"].values():
+        begin = arrow.get(period["begin"])
+        end = arrow.get(period["end"])
+        period["delta"] = humanize.naturaldelta(end - begin)
+        year_begin = begin.date().year
+        year_end = end.date().year
+        if year_begin == year_end:
+            period["year_span"] = year_begin
+        else:
+            period["year_span"] = f"{year_begin}-{year_end}"
+
+
 @task
 def show_data(context):
     data = read_toml_data(data_dir)
-    json_data = json.dumps(data, indent=4)
-    print(json_data)
+    enrich_data(data)
+    print(json.dumps(data, indent=4))
 
 
 def _build():
@@ -60,6 +75,7 @@ def _build():
     env = Environment(loader=FileSystemLoader(template_dir))
     env.filters["markdown"] = lambda text: markdown.markdown(text)
     data = read_toml_data(data_dir)
+    enrich_data(data)
 
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
