@@ -45,19 +45,23 @@ URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 
 
 # ---
+def add_human_timespan(period):
+    begin = arrow.get(period["begin"])
+    end = arrow.get(period["end"])
+    period["delta"] = humanize.naturaldelta(end - begin)
+    year_begin = begin.date().year
+    year_end = end.date().year
+    if year_begin == year_end:
+        period["year_span"] = year_begin
+    else:
+        period["year_span"] = f"{year_begin}-{year_end}"
 
 
 def enrich_data(data):
     for period in data["work"].values():
-        begin = arrow.get(period["begin"])
-        end = arrow.get(period["end"])
-        period["delta"] = humanize.naturaldelta(end - begin)
-        year_begin = begin.date().year
-        year_end = end.date().year
-        if year_begin == year_end:
-            period["year_span"] = year_begin
-        else:
-            period["year_span"] = f"{year_begin}-{year_end}"
+        add_human_timespan(period)
+    for period in data["training"].values():
+        add_human_timespan(period)
 
 
 @task

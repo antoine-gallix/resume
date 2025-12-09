@@ -15,17 +15,15 @@ p {
 /* work heading */
 
 .company {
-    font-size: x-large;
+    font-size: xx-large;
 }
 
 .timerange {
     font-size: x-large;
+    display: flex;
+    justify-content: space-between;
 }
 
-.job-attributes {
-    display: flex;
-    gap: 1rem;
-}
 
 
 /* work labels */

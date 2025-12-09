@@ -47,9 +47,10 @@
             <div>
                 {% for period in work.values()|sort(attribute="begin",reverse=True) %}
                 <h3>{{period.title}}</h3>
-                <div class="job-attributes">
-                    <div class="company">{{period.company}}</div>
-                    <div class="timerange">{{period.delta}} over {{period.year_span}}</div>
+                <div class="company">{{period.company}}</div>
+                <div class="timerange">
+                    <div>{{period.delta}}</div>
+                    <div>{{period.year_span}}</div>
                 </div>
                 <p>{{period.description | markdown | safe}}</p>
                 <ul class="labels">
@@ -72,10 +73,12 @@
             <div>
                 {% for period in training.values()|sort(attribute="begin",reverse=True) %}
                 <h3 class="job-head-1st-line">{{period.path}}</h3>
-                <div class="job-attributes">
-                    <div class="company">{{period.institution}}</div>
-                    <div class="timerange">{{period.begin}} to {{period.end}}</div>
+                <div class="company">{{period.institution}}</div>
+                <div class="timerange">
+                    <div>{{period.delta}}</div>
+                    <div>{{period.year_span}}</div>
                 </div>
+
                 <p>{{period.description | markdown | safe}}</p>
                 <hr>
                 {% endfor %}
