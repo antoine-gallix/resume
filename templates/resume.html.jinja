@@ -49,6 +49,7 @@
                 {% for period in work.values()|sort(attribute="begin",reverse=True) %}
                 <h3>{{period.title}}</h3>
                 <div class="company">{{period.company}}</div>
+                <div class="location">{{period.location}}</div>
                 <div class="timerange">
                     <div>{{period.delta}}</div>
                     <div>{{period.year_span}}</div>

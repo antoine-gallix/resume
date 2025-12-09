@@ -18,6 +18,10 @@ p {
     font-size: xx-large;
 }
 
+.location {
+    font-size: x-large;
+}
+
 .timerange {
     font-size: x-large;
     display: flex;
