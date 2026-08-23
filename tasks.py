@@ -12,7 +12,7 @@ from jinja2 import Environment, FileSystemLoader
 from livereload import Server
 from loguru import logger
 
-from config import settings
+from config import config
 
 # ---
 
@@ -39,8 +39,8 @@ def write(content, name):
 
 static_dir: Path = resolved_path(STATIC_DIR)
 template_dir: Path = resolved_path(TEMPLATE_DIR)
-data_dir = resolved_path(settings.DATA_DIR)
-build_dir = resolved_path(settings.BUILD_DIR)
+data_dir = resolved_path(config.DATA_DIR)
+build_dir = resolved_path(config.BUILD_DIR)
 URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 
 
@@ -62,6 +62,11 @@ def enrich_data(data):
         add_human_timespan(period)
     for period in data["training"].values():
         add_human_timespan(period)
+
+
+@task
+def show_config(context):
+    print(json.dumps(config, indent=4))
 
 
 @task

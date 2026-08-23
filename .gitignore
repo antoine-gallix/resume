@@ -5,3 +5,4 @@ dev.py
 # Ignore dynaconf secret files
 .secrets.*
 *.code-workspace
+config.toml

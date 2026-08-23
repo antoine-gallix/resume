@@ -1,0 +1,6 @@
+# fill the following paths
+
+# CV data directory
+DATA_DIR = ""
+# CV build directory
+BUILD_DIR = ""
