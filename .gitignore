@@ -6,3 +6,4 @@ dev.py
 .secrets.*
 *.code-workspace
 config.toml
+.vscode/
