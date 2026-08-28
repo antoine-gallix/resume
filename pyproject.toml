@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+"deepmerge>=3.0",
     "dynaconf>=3.2.12",
     "etabli",
     "funcy>=2.0",

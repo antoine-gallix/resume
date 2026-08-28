@@ -69,22 +69,27 @@ def show_config(context):
     print(config.to_dict())
 
 
-@task
-def show_data(context):
+def build_data():
     data = read_toml_data(data_dir)
     enrich_data(data)
+    return data
+
+
+@task
+def show_data(context):
+
+    data = build_data()
     print(json.dumps(data, indent=4))
 
 
-def _build():
+def _build_html():
     build_dir.mkdir(exist_ok=True, parents=True)
 
     logger.info("build resume from templates")
 
     env = Environment(loader=FileSystemLoader(template_dir))
     env.filters["markdown"] = lambda text: markdown.markdown(text)
-    data = read_toml_data(data_dir)
-    enrich_data(data)
+    data = build_data()
 
     html_template = env.get_template(f"{HTML_NAME}.jinja")
     html_output = html_template.render(**data)
@@ -99,13 +104,15 @@ def _build():
 
 @task
 def build(context):
-    _build()
+    _build_html()
 
 
 @task
 def autobuild(context):
-    watcher = Watcher(targets=[static_dir, template_dir, data_dir], callback=_build)
-    _build()
+    watcher = Watcher(
+        targets=[static_dir, template_dir, data_dir], callback=_build_html
+    )
+    _build_html()
     watcher.watch()
 
 
