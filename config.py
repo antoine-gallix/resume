@@ -1,11 +1,13 @@
 import sys
 from pathlib import Path
 
-from dynaconf import Dynaconf
+from dynaconf import Dynaconf, Validator
 from loguru import logger
 
 USER_CONFIG_PATH = "config.toml"
 DEFAULT_CONFIG_PATH = "config.default.toml"
+
+# ensure config file exists, otherwise create it and exit
 if not (config_file := Path(USER_CONFIG_PATH)).exists():
     default_content = Path(DEFAULT_CONFIG_PATH).read_text()
     config_file.parent.mkdir(parents=True, exist_ok=True)
@@ -15,6 +17,19 @@ if not (config_file := Path(USER_CONFIG_PATH)).exists():
     )
     sys.exit()
 
+
 config = Dynaconf(
-    settings_files=["settings.toml"],
+    settings_files=["config.default.toml", "config.toml"],
+    validators=[
+        Validator(
+            "DATA_DIR",
+            must_exist=True,
+            cast=lambda path: Path(path).expanduser(),
+        ),
+        Validator(
+            "BUILD_DIR",
+            must_exist=True,
+            cast=lambda path: Path(path).expanduser(),
+        ),
+    ],
 )

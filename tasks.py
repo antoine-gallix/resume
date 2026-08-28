@@ -66,7 +66,7 @@ def enrich_data(data):
 
 @task
 def show_config(context):
-    print(json.dumps(config, indent=4))
+    print(config.to_dict())
 
 
 @task
