@@ -1,9 +1,8 @@
-output/
-data/
 __pycache__
-dev.py
-# Ignore dynaconf secret files
-.secrets.*
+
 *.code-workspace
-config.toml
 .vscode/
+
+config.toml
+
+dev.py
