@@ -7,12 +7,13 @@ from livereload import Server
 from loguru import logger
 
 from resume.build import (
+    COMPILED_DATA_FILE,
     HTML_NAME,
     STATIC_DIR,
     TEMPLATE_DIR,
     _build_html,
     _build_pdf,
-    build_data,
+    _compile_data,
 )
 from resume.config import config
 
@@ -37,9 +38,15 @@ def print_config(context):
 
 
 @task
+def compile_data(context):
+    data = _compile_data()
+    COMPILED_DATA_FILE.write_text(json.dumps(data, indent=4))
+
+
+@task
 def print_data(context):
     """print the parsed and enriched resumedata"""
-    print_json(build_data())
+    print(COMPILED_DATA_FILE.read_text())
 
 
 @task
