@@ -8,16 +8,11 @@ from loguru import logger
 
 from resume.build import (
     HTML_NAME,
-    SERVER_HOST,
-    SERVER_PORT,
-    URL,
+    STATIC_DIR,
+    TEMPLATE_DIR,
     _build_html,
     _build_pdf,
     build_data,
-    build_dir,
-    data_dir,
-    static_dir,
-    template_dir,
 )
 from resume.config import config
 
@@ -38,8 +33,8 @@ def print_config(context):
 
 
 @task
-def show_data(context):
-    """print the data that will be used to generate the resume"""
+def print_data(context):
+    """print the parsed and enriched resumedata"""
     print_json(build_data())
 
 
@@ -49,9 +44,14 @@ def build_pdf(context):
 
 
 @task
+def build_html(context):
+    _build_html()
+
+
+@task
 def autobuild(context):
     watcher = Watcher(
-        targets=[static_dir, template_dir, data_dir], callback=_build_html
+        targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR], callback=_build_html
     )
     _build_html()
     watcher.watch()
@@ -59,21 +59,28 @@ def autobuild(context):
 
 @task
 def serve_html(context):
+    SERVER_HOST = "localhost"
+    SERVER_PORT = 35729
+    URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
+
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
-    server.watch(build_dir)
+    server.watch(config.BUILD_DIR)
     logger.info(f"serving build content at {URL}")
     server.serve(
-        root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
+        root=config.BUILD_DIR,
+        port=SERVER_PORT,
+        host=SERVER_HOST,
+        default_filename=HTML_NAME,
     )
-
-
-@task
-def build(context):
-    _build_html()
-    _build_pdf(context)
 
 
 @task
 def view(context):
     context.run(f"firefox --new-window {URL}", disown=True)
+
+
+@task
+def build_all(context):
+    _build_html()
+    _build_pdf(context)
