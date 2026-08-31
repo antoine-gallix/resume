@@ -1,4 +1,4 @@
-"""Experimental alternative to etabli.reader.read_toml_data.
+"""Read a directory of toml files and merge them into a single dict
 
 Pipeline: list every toml file under the data dir -> embed each file's
 content into a nested dict following its relative path -> merge all the
@@ -7,18 +7,20 @@ overwriting them.
 """
 
 import tomllib
+from functools import reduce
 from pathlib import Path
 
-from deepmerge import Merger
+from deepmerge.merger import Merger
 
 
 def list_files(data_dir: Path) -> list[Path]:
+    """list toml files in that directory"""
     return sorted(data_dir.rglob("*.toml"))
 
 
 def embed(data_dir: Path, file_path: Path) -> dict:
     """Nest a file's parsed content under keys taken from its path, e.g.
-    work/2011 - SiPBA.toml -> {"work": {"2011 - SiPBA": {...}}}"""
+    experiences/company.toml -> {"experiences": {"company": {...}}}"""
     content = tomllib.loads(file_path.read_text())
     parts = file_path.relative_to(data_dir).with_suffix("").parts
     for part in reversed(parts):
@@ -42,14 +44,7 @@ merger = Merger(
 )
 
 
-def merge(dicts: list[dict]) -> dict:
-    result: dict = {}
-    for d in dicts:
-        result = merger.merge(result, d)
-    return result
-
-
 def parse(data_dir: Path) -> dict:
     files = list_files(data_dir)
     embedded = [embed(data_dir, file) for file in files]
-    return merge(embedded)
+    return reduce(merger.merge, embedded, {})

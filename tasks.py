@@ -1,110 +1,40 @@
 import json
-import shutil
-from pathlib import Path
 
-import arrow
-import humanize
-import markdown
-from etabli.reader import read_toml_data
 from etabli.watcher import Watcher
-from invoke import task  # type:ignore
-from jinja2 import Environment, FileSystemLoader
+from invoke import task  # type: ignore
 from livereload import Server
 from loguru import logger
 
-from config import config
-
-# ---
-
-TEMPLATE_DIR = "templates"
-HTML_NAME = "resume.html"
-STATIC_DIR = "static"
-SERVER_HOST = "localhost"
-SERVER_PORT = 35729
-
-# ---
-
-
-def resolved_path(path: str) -> Path:
-    return Path(path).expanduser()
-
-
-def write(content, name):
-    output_file = build_dir / name
-    output_file.write_text(content)
-    logger.info(f"file written: {output_file}")
-
-
-# ---
-
-static_dir: Path = resolved_path(STATIC_DIR)
-template_dir: Path = resolved_path(TEMPLATE_DIR)
-data_dir = resolved_path(config.DATA_DIR)
-build_dir = resolved_path(config.BUILD_DIR)
-URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
-
-
-# ---
-def add_human_timespan(period):
-    begin = arrow.get(period["begin"])
-    end = arrow.get(period["end"])
-    period["delta"] = humanize.naturaldelta(end - begin)
-    year_begin = begin.date().year
-    year_end = end.date().year
-    if year_begin == year_end:
-        period["year_span"] = year_begin
-    else:
-        period["year_span"] = f"{year_begin}-{year_end}"
-
-
-def enrich_data(data):
-    for period in data["work"].values():
-        add_human_timespan(period)
-    for period in data["training"].values():
-        add_human_timespan(period)
+from resume.build import (
+    HTML_NAME,
+    SERVER_HOST,
+    SERVER_PORT,
+    URL,
+    _build_html,
+    _build_pdf,
+    build_data,
+    build_dir,
+    data_dir,
+    static_dir,
+    template_dir,
+)
+from resume.config import config
 
 
 @task
-def show_config(context):
+def print_config(context):
     print(config.to_dict())
-
-
-def build_data():
-    data = read_toml_data(data_dir)
-    enrich_data(data)
-    return data
 
 
 @task
 def show_data(context):
-
-    data = build_data()
-    print(json.dumps(data, indent=4))
-
-
-def _build_html():
-    build_dir.mkdir(exist_ok=True, parents=True)
-
-    logger.info("build resume from templates")
-
-    env = Environment(loader=FileSystemLoader(template_dir))
-    env.filters["markdown"] = lambda text: markdown.markdown(text)
-    data = build_data()
-
-    html_template = env.get_template(f"{HTML_NAME}.jinja")
-    html_output = html_template.render(**data)
-    write(html_output, HTML_NAME)
-
-    for file in static_dir.iterdir():
-        logger.info(f"copy {file} into {build_dir}")
-        shutil.copy(file, build_dir)
-
-    logger.info("resume generated successfully")
+    """print the data that will be used to generate the resume"""
+    print(json.dumps(build_data(), indent=4))
 
 
 @task
-def build(context):
-    _build_html()
+def build_pdf(context):
+    _build_pdf(context)
 
 
 @task
@@ -117,7 +47,7 @@ def autobuild(context):
 
 
 @task
-def serve(context):
+def serve_html(context):
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
     server.watch(build_dir)
@@ -125,6 +55,12 @@ def serve(context):
     server.serve(
         root=build_dir, port=SERVER_PORT, host=SERVER_HOST, default_filename=HTML_NAME
     )
+
+
+@task
+def build(context):
+    _build_html()
+    _build_pdf(context)
 
 
 @task

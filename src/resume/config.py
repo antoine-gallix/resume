@@ -4,12 +4,13 @@ from pathlib import Path
 from dynaconf import Dynaconf, Validator
 from loguru import logger
 
-USER_CONFIG_PATH = "config.toml"
-DEFAULT_CONFIG_PATH = "config.default.toml"
+ROOT = Path(__file__).parents[2]
+USER_CONFIG_PATH = ROOT / "config.toml"
+DEFAULT_CONFIG_PATH = ROOT / "config.default.toml"
 
 # ensure config file exists, otherwise create it and exit
-if not (config_file := Path(USER_CONFIG_PATH)).exists():
-    default_content = Path(DEFAULT_CONFIG_PATH).read_text()
+if not (config_file := USER_CONFIG_PATH).exists():
+    default_content = DEFAULT_CONFIG_PATH.read_text()
     config_file.parent.mkdir(parents=True, exist_ok=True)
     config_file.write_text(default_content)
     logger.info(
@@ -19,7 +20,7 @@ if not (config_file := Path(USER_CONFIG_PATH)).exists():
 
 
 config = Dynaconf(
-    settings_files=["config.default.toml", "config.toml"],
+    settings_files=[str(DEFAULT_CONFIG_PATH), str(USER_CONFIG_PATH)],
     validators=[
         Validator(
             "DATA_DIR",
