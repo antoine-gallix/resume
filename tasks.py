@@ -16,6 +16,10 @@ from resume.build import (
 )
 from resume.config import config
 
+SERVER_HOST = "localhost"
+SERVER_PORT = 35729
+URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
+
 
 def _json_default(obj):
     if isinstance(obj, Path):
@@ -58,10 +62,8 @@ def autobuild(context):
 
 
 @task
-def serve_html(context):
-    SERVER_HOST = "localhost"
-    SERVER_PORT = 35729
-    URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
+def serve(context):
+    """serve the resume locally with livereload"""
 
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
