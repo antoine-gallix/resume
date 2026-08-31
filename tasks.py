@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from etabli.watcher import Watcher
 from invoke import task  # type: ignore
@@ -21,15 +22,25 @@ from resume.build import (
 from resume.config import config
 
 
+def _json_default(obj):
+    if isinstance(obj, Path):
+        return str(obj)
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
+def print_json(data):
+    print(json.dumps(data, indent=4, default=_json_default))
+
+
 @task
 def print_config(context):
-    print(config.to_dict())
+    print_json(config.to_dict())
 
 
 @task
 def show_data(context):
     """print the data that will be used to generate the resume"""
-    print(json.dumps(build_data(), indent=4))
+    print_json(build_data())
 
 
 @task
