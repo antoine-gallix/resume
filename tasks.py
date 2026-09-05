@@ -35,33 +35,39 @@ def print_json(data):
 
 @task
 def print_config(context):
+    """show the config"""
     print_json(config.to_dict())
 
 
 @task
 def compile_data(context):
+    """compile data directory to a file"""
     data = _compile_data()
     COMPILED_DATA_FILE.write_text(json.dumps(data, indent=4))
 
 
 @task
 def print_data(context):
+    """show compiled data"""
     """print the parsed and enriched resumedata"""
     print(COMPILED_DATA_FILE.read_text())
 
 
 @task
 def build_pdf(context):
+    """build pdf resume"""
     _build_pdf(context)
 
 
 @task
 def build_html(context):
+    """build html resume"""
     _build_html()
 
 
 @task
 def autobuild(context):
+    """rebuild when source files change"""
     watcher = Watcher(
         targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR], callback=_build_html
     )
@@ -71,7 +77,7 @@ def autobuild(context):
 
 @task
 def serve(context):
-    """serve the resume locally with livereload"""
+    """serve the html resume locally with livereload"""
 
     server = Server()
     server.setHeader("Cache-Control", "no-store")  # prevent caching
@@ -86,11 +92,6 @@ def serve(context):
 
 
 @task
-def view(context):
+def view_html(context):
+    """open local html resume in a browser. requires local server running"""
     context.run(f"firefox --new-window {URL}", disown=True)
-
-
-@task
-def build_all(context):
-    _build_html()
-    _build_pdf(context)

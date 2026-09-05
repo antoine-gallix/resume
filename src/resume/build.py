@@ -84,7 +84,8 @@ def _build_html():
 
 def _build_pdf(context):
     logger.info("build pdf resume")
-
+    """ typst requires template, data and output must be under a common root. build therefore happens in a temp dir that is cleaned afterward.
+    """
     with tempfile.TemporaryDirectory(prefix="resume-pdf-") as tmp:
         stage = Path(tmp)
         template = stage / PDF_TEMPLATE.name
