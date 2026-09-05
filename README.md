@@ -36,6 +36,9 @@ Use `invoke` command runner.
 
 `invoke --list` to see available commands.
 
-`invoke build` : build resume
-`invoke autobuild` : rebuild everytime something changes in the data directory, or the template directory.
-`invoke serve` : autoreloading local web server of the resume
+Tasks are grouped into `data.*`, `html.*`, and `pdf.*` collections.
+
+`invoke html.build` : build the HTML resume
+`invoke pdf.build` : build the PDF resume
+`invoke html.autobuild` : rebuild everytime something changes in the data directory, or the template directory.
+`invoke html.serve` : autoreloading local web server of the resume

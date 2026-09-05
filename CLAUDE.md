@@ -8,16 +8,17 @@ A static resume/CV generator. It reads semantic data from a directory of TOML fi
 
 ## Commands
 
-Tasks are run with `invoke` (Python task runner defined in `tasks.py`), not `make` or `just`.
+Tasks are run with `invoke` (Python task runner defined in `tasks.py`), not `make` or `just`. Tasks are grouped into `data.*`, `html.*`, and `pdf.*` collections (defined via `invoke.Collection` in `tasks.py`), plus a top-level `config` task.
 
 - `invoke --list` — list available tasks
-- `invoke build` — render the HTML resume once into `BUILD_DIR`
-- `invoke build-pdf` — render the PDF resume via Typst into `BUILD_DIR` (requires the `typst` CLI on `PATH`; it's not a Python dependency)
-- `invoke autobuild` — rebuild the HTML resume whenever files under `static/`, `templates/`, or `DATA_DIR` change (PDF build is not wired into the watcher)
-- `invoke serve` — serve `BUILD_DIR` with livereload on `localhost:35729`
-- `invoke view` — open the served resume in Firefox
-- `invoke print-config` — print the resolved Dynaconf config
-- `invoke show-data` — print the parsed+enriched resume data as JSON
+- `invoke config` — print the resolved Dynaconf config
+- `invoke data.compile` — parse+enrich the resume data and write it to `COMPILED_DATA_FILE`
+- `invoke data.print` — print the compiled data file
+- `invoke html.build` — render the HTML resume once into `BUILD_DIR`
+- `invoke html.autobuild` — rebuild the HTML resume whenever files under `static/`, `templates/`, or `DATA_DIR` change (PDF build is not wired into the watcher)
+- `invoke html.serve` — serve `BUILD_DIR` with livereload on `localhost:35729`
+- `invoke html.view` — open the served resume in Firefox
+- `invoke pdf.build` — render the PDF resume via Typst into `BUILD_DIR` (requires the `typst` CLI on `PATH`; it's not a Python dependency)
 
 There is no lint/test setup configured in this project currently.
 
@@ -43,10 +44,10 @@ From there the two builds diverge:
 - `_build_html()`: the Jinja2 template `templates/resume.html.jinja` renders the dict into `resume.html` → static assets in `static/` (CSS, favicon) are copied alongside it into `BUILD_DIR`.
 - `_build_pdf()`: the data dict is dumped to JSON (`PDF_DIR / TYPST_DATA`) and a Typst template (`PDF_DIR / PDF_TEMPLATE`, reading that JSON via `json()`) is compiled to `BUILD_DIR / PDF_NAME` by shelling out to `typst compile`.
 
-Known inconsistency as of this writing: `PDF_DIR` is set to `ROOT / "pdf"` in `src/resume/build.py`, but the only Typst template currently on disk is the untracked `templates/resume.typ`, and `pdf/` doesn't exist — `invoke build-pdf` will fail until either the constant or the file's location is fixed.
+Known inconsistency as of this writing: `PDF_DIR` is set to `ROOT / "pdf"` in `src/resume/build.py`, but the only Typst template currently on disk is the untracked `templates/resume.typ`, and `pdf/` doesn't exist — `invoke pdf.build` will fail until either the constant or the file's location is fixed.
 
 `DATA_DIR` is expected to hold TOML files arranged as documented in `README.md`: top-level files (`about.toml`, `languages.toml`, `skills.toml`) plus `training/` and `work/` subdirectories of dated entries — this directory lives outside the repo (path comes from config) and isn't part of the checked-in project structure.
 
-`etabli.watcher.Watcher` (used by `invoke autobuild`) watches `static_dir`, `template_dir`, and `data_dir` and reruns `_build_html()` on change.
+`etabli.watcher.Watcher` (used by `invoke html.autobuild`) watches `static_dir`, `template_dir`, and `data_dir` and reruns `_build_html()` on change.
 
 `write()` (the shared file-writing helper in `src/resume/build.py`) creates any missing parent directories before writing.

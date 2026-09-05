@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from etabli.watcher import Watcher
-from invoke import task  # type: ignore
+from invoke import Collection, task  # type: ignore
 from livereload import Server
 from loguru import logger
 
@@ -39,6 +39,9 @@ def print_config(context):
     print_json(config.to_dict())
 
 
+# --- data -------------------------------------------------------------------
+
+
 @task
 def compile_data(context):
     """compile data directory to a file"""
@@ -49,14 +52,10 @@ def compile_data(context):
 @task
 def print_data(context):
     """show compiled data"""
-    """print the parsed and enriched resumedata"""
     print(COMPILED_DATA_FILE.read_text())
 
 
-@task
-def build_pdf(context):
-    """build pdf resume"""
-    _build_pdf(context)
+# --- html -----------------------------------------------------------------
 
 
 @task
@@ -67,7 +66,7 @@ def build_html(context):
 
 @task
 def autobuild(context):
-    """rebuild when source files change"""
+    """rebuild html when source files change"""
     watcher = Watcher(
         targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR], callback=_build_html
     )
@@ -95,3 +94,34 @@ def serve(context):
 def view_html(context):
     """open local html resume in a browser. requires local server running"""
     context.run(f"firefox --new-window {URL}", disown=True)
+
+
+# --- pdf ------------------------------------------------------------------
+
+
+@task
+def build_pdf(context):
+    """build pdf resume"""
+    _build_pdf(context)
+
+
+# --- namespace ----------------------------------------------------------------
+
+data = Collection("data")
+data.add_task(compile_data, "compile")
+data.add_task(print_data, "print")
+
+html = Collection("html")
+html.add_task(build_html, "build")
+html.add_task(autobuild)
+html.add_task(serve)
+html.add_task(view_html, "view")
+
+pdf = Collection("pdf")
+pdf.add_task(build_pdf, "build")
+
+namespace = Collection()
+namespace.add_task(print_config, "config")
+namespace.add_collection(data)
+namespace.add_collection(html)
+namespace.add_collection(pdf)
