@@ -22,14 +22,15 @@ SERVER_PORT = 35729
 URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 
 
-def _json_default(obj):
-    if isinstance(obj, Path):
-        return str(obj)
-    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+class PathEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Path):
+            return str(obj)
+        return super().default(obj)
 
 
 def print_json(data):
-    print(json.dumps(data, indent=4, default=_json_default))
+    print(json.dumps(data, indent=4, cls=PathEncoder))
 
 
 @task
