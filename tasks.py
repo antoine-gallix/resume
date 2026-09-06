@@ -66,7 +66,7 @@ def build_html(context):
 
 
 @task
-def autobuild(context):
+def autobuild_html(context):
     """rebuild html when source files change"""
     watcher = Watcher(
         targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR], callback=_build_html
@@ -76,7 +76,7 @@ def autobuild(context):
 
 
 @task
-def serve(context):
+def serve_html(context):
     """serve the html resume locally with livereload"""
 
     server = Server()
@@ -120,8 +120,8 @@ data.add_task(print_data, "print")
 
 html = Collection("html")
 html.add_task(build_html, "build")
-html.add_task(autobuild)
-html.add_task(serve)
+html.add_task(autobuild_html)
+html.add_task(serve_html)
 html.add_task(view_html, "view")
 
 pdf = Collection("pdf")
