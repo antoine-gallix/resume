@@ -6,20 +6,21 @@ from invoke import Collection, task  # type: ignore
 from livereload import Server
 from loguru import logger
 
-from resume.build import (
-    COMPILED_DATA_FILE,
-    HTML_NAME,
-    PDF_OUTPUT_FILE,
-    STATIC_DIR,
-    TEMPLATE_DIR,
-    _build_html,
-    _build_pdf,
-    _compile_data,
-)
-from resume.config import config
+from resume.build import _build_html, _build_pdf, _compile_data
+from resume.config import ROOT, config
 
 SERVER_HOST = "localhost"
 SERVER_PORT = 35729
+
+TEMPLATE_DIR = ROOT / "templates"
+STATIC_DIR = ROOT / "static"
+PDF_TEMPLATE = TEMPLATE_DIR / "resume.typ"
+COMPILED_DATA_FILE = config.BUILD_DIR / "data.json"
+# filename the typst template's json() call expects, relative to itself
+TYPST_DATA_NAME = "resume.json"
+PDF_OUTPUT_FILE = config.BUILD_DIR / "resume.pdf"
+HTML_NAME = "resume.html"
+
 URL = f"{SERVER_HOST}:{SERVER_PORT}/{HTML_NAME}"
 
 
@@ -46,7 +47,7 @@ def print_config(context):
 @task
 def compile_data(context):
     """compile data directory to a file"""
-    data = _compile_data()
+    data = _compile_data(config.DATA_DIR)
     COMPILED_DATA_FILE.write_text(json.dumps(data, indent=4))
 
 
@@ -59,19 +60,30 @@ def print_data(context):
 # --- html -----------------------------------------------------------------
 
 
+def build_html_args():
+    return dict(
+        template_dir=TEMPLATE_DIR,
+        static_dir=STATIC_DIR,
+        compiled_data_file=COMPILED_DATA_FILE,
+        build_dir=config.BUILD_DIR,
+        html_name=HTML_NAME,
+    )
+
+
 @task
 def build_html(context):
     """build html resume"""
-    _build_html()
+    _build_html(**build_html_args())
 
 
 @task
 def autobuild_html(context):
     """rebuild html when source files change"""
     watcher = Watcher(
-        targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR], callback=_build_html
+        targets=[STATIC_DIR, TEMPLATE_DIR, config.DATA_DIR],
+        callback=lambda: _build_html(**build_html_args()),
     )
-    _build_html()
+    _build_html(**build_html_args())
     watcher.watch()
 
 
@@ -103,7 +115,13 @@ def view_html(context):
 @task
 def build_pdf(context):
     """build pdf resume"""
-    _build_pdf(context)
+    _build_pdf(
+        context,
+        pdf_template=PDF_TEMPLATE,
+        compiled_data_file=COMPILED_DATA_FILE,
+        typst_data_name=TYPST_DATA_NAME,
+        pdf_output_file=PDF_OUTPUT_FILE,
+    )
 
 
 @task
