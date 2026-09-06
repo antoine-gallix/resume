@@ -12,9 +12,11 @@ from resume.config import ROOT, config
 SERVER_HOST = "localhost"
 SERVER_PORT = 35729
 
-TEMPLATE_DIR = ROOT / "templates"
-STATIC_DIR = ROOT / "static"
-PDF_TEMPLATE = TEMPLATE_DIR / "resume.typ"
+HTML_DIR = ROOT / "html"
+TEMPLATE_DIR = HTML_DIR
+STATIC_DIR = HTML_DIR
+PDF_DIR = ROOT / "pdf"
+PDF_TEMPLATE = PDF_DIR / "resume.typ"
 COMPILED_DATA_FILE = config.BUILD_DIR / "data.json"
 # filename the typst template's json() call expects, relative to itself
 TYPST_DATA_NAME = "resume.json"

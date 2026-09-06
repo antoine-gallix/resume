@@ -62,8 +62,10 @@ def _build_html(*, template_dir, static_dir, compiled_data_file, build_dir, html
     html_output = html_template.render(**data)
     write(html_output, build_dir / html_name)
 
-    # copy static
+    # copy static files, skip the jinja template
     for file in static_dir.iterdir():
+        if file.suffix == ".jinja":
+            continue
         logger.info(f"copy {file} into {build_dir}")
         shutil.copy(file, build_dir)
 
