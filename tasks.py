@@ -9,6 +9,7 @@ from loguru import logger
 from resume.build import (
     COMPILED_DATA_FILE,
     HTML_NAME,
+    PDF_OUTPUT_FILE,
     STATIC_DIR,
     TEMPLATE_DIR,
     _build_html,
@@ -105,6 +106,12 @@ def build_pdf(context):
     _build_pdf(context)
 
 
+@task
+def open_pdf(context):
+    """open the built pdf resume. linux only"""
+    context.run(f'xdg-open "{PDF_OUTPUT_FILE}"', disown=True)
+
+
 # --- namespace ----------------------------------------------------------------
 
 data = Collection("data")
@@ -119,6 +126,7 @@ html.add_task(view_html, "view")
 
 pdf = Collection("pdf")
 pdf.add_task(build_pdf, "build")
+pdf.add_task(open_pdf, "open")
 
 namespace = Collection()
 namespace.add_task(print_config, "config")
