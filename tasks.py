@@ -135,21 +135,22 @@ def open_pdf(context):
 # --- namespace ----------------------------------------------------------------
 
 data = Collection("data")
-data.add_task(compile_data, "compile")
-data.add_task(print_data, "print")
+data.add_task(compile_data, "compile")  # type: ignore[arg-type]
+data.add_task(print_data, "print")  # type: ignore[arg-type]
 
 html = Collection("html")
-html.add_task(build_html, "build")
-html.add_task(autobuild_html)
-html.add_task(serve_html)
-html.add_task(view_html, "view")
+html.add_task(build_html, "build")  # type: ignore[arg-type]
+html.add_task(autobuild_html)  # type: ignore[arg-type]
+html.add_task(serve_html)  # type: ignore[arg-type]
+html.add_task(view_html, "view")  # type: ignore[arg-type]
 
 pdf = Collection("pdf")
-pdf.add_task(build_pdf, "build")
-pdf.add_task(open_pdf, "open")
+pdf.add_task(build_pdf, "build")  # type: ignore[arg-type]
+pdf.add_task(autobuild_pdf)  # type: ignore[arg-type]
+pdf.add_task(open_pdf, "open")  # type: ignore[arg-type]
 
 namespace = Collection()
-namespace.add_task(print_config, "config")
+namespace.add_task(print_config, "config")  # type: ignore[arg-type]
 namespace.add_collection(data)
 namespace.add_collection(html)
 namespace.add_collection(pdf)
