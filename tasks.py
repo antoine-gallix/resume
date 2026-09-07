@@ -1,4 +1,5 @@
 import json
+import shutil
 from pathlib import Path
 
 from etabli.watcher import Watcher
@@ -63,13 +64,13 @@ def print_data(context):
 
 
 def build_html_args():
-    return dict(
-        template_dir=TEMPLATE_DIR,
-        static_dir=STATIC_DIR,
-        compiled_data_file=COMPILED_DATA_FILE,
-        build_dir=config.BUILD_DIR,
-        html_name=HTML_NAME,
-    )
+    return {
+        "template_dir": TEMPLATE_DIR,
+        "static_dir": STATIC_DIR,
+        "compiled_data_file": COMPILED_DATA_FILE,
+        "build_dir": config.BUILD_DIR,
+        "html_name": HTML_NAME,
+    }
 
 
 @task
@@ -124,6 +125,41 @@ def build_pdf(context):
         typst_data_name=TYPST_DATA_NAME,
         pdf_output_file=PDF_OUTPUT_FILE,
     )
+
+
+@task
+def autobuild_pdf(context):
+    """recompile the pdf whenever the data or the typst template changes.
+
+    two things run together: a watcher that regenerates the json inputs from the
+    toml data, and `typst watch` which recompiles on any change to the template
+    or the json it reads. open the result with a viewer that reloads on change
+    (e.g. `okular BUILD_DIR/resume.pdf`).
+    """
+    stage = config.BUILD_DIR / "_pdf_stage"
+    stage.mkdir(parents=True, exist_ok=True)
+    template = stage / PDF_TEMPLATE.name
+
+    def refresh_inputs():
+        shutil.copy(PDF_TEMPLATE, template)
+        data = _compile_data(config.DATA_DIR)
+        (stage / TYPST_DATA_NAME).write_text(json.dumps(data, indent=4))
+        logger.info("pdf inputs refreshed")
+
+    refresh_inputs()
+    watcher = Watcher(
+        targets=[PDF_DIR, config.DATA_DIR],
+        callback=refresh_inputs,
+    )
+
+    typst = context.run(
+        f'typst watch --root "{stage}" "{template}" "{PDF_OUTPUT_FILE}"',
+        asynchronous=True,
+    )
+    try:
+        watcher.watch()
+    finally:
+        typst.runner.kill()
 
 
 @task
