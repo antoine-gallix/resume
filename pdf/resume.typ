@@ -67,8 +67,7 @@
     #v(0.1em)
     #grid(
       columns: (1fr, auto),
-      text(size: 11pt, style: "italic")[#period.company, #period.location],
-      timerange(period),
+      text(size: 11pt)[#period.company, #period.location], timerange(period),
     )
     #v(0.3em)
     #period.description
