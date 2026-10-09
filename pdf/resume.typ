@@ -70,8 +70,7 @@
 #section-separator
 #section-title("Work")
 
-#for period in data.work.values().sorted(key: p => p.begin).rev() [
-  #block(above: 1em, below: 0.6em, breakable: false)[
+#data.work.values().sorted(key: p => p.begin).rev().map(period => block(above: 1em, below: 0.6em, breakable: false)[
     #text(size: 12pt, weight: "bold")[#period.title]
     #v(0.1em)
     #grid(
@@ -81,16 +80,13 @@
     #v(0.3em)
     #period.description
     #tags(period)
-  ]
-  #subsection-separator
-]
+  ]).join(subsection-separator)
 
 // ------------------------ TRAINING ------------------------
 #section-separator
 #section-title("Training")
 
-#for period in data.training.values().sorted(key: p => p.begin).rev() [
-  #block(above: 1em, below: 0.6em)[
+#data.training.values().sorted(key: p => p.begin).rev().map(period => block(above: 1em, below: 0.6em)[
     #text(size: 12pt, weight: "bold")[#period.institution]
     #v(0.1em)
     #grid(
@@ -99,6 +95,4 @@
     )
     #v(0.1em)
     #period.description
-  ]
-  #subsection-separator
-]
+  ]).join(subsection-separator)
