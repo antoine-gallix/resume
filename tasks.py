@@ -176,13 +176,13 @@ data.add_task(print_data, "print")  # type: ignore[arg-type]
 
 html = Collection("html")
 html.add_task(build_html, "build")  # type: ignore[arg-type]
-html.add_task(autobuild_html)  # type: ignore[arg-type]
-html.add_task(serve_html)  # type: ignore[arg-type]
+html.add_task(autobuild_html, "autobuild")  # type: ignore[arg-type]
+html.add_task(serve_html, "serve")  # type: ignore[arg-type]
 html.add_task(view_html, "view")  # type: ignore[arg-type]
 
 pdf = Collection("pdf")
 pdf.add_task(build_pdf, "build")  # type: ignore[arg-type]
-pdf.add_task(autobuild_pdf)  # type: ignore[arg-type]
+pdf.add_task(autobuild_pdf, "autobuild")  # type: ignore[arg-type]
 pdf.add_task(open_pdf, "open")  # type: ignore[arg-type]
 
 namespace = Collection()
