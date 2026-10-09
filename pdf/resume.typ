@@ -13,35 +13,47 @@
 
 #let section-title(title) = block(above: 1em, below: 0.6em)[
   #text(size: 14pt, weight: "bold")[#title]
-  #line(length: 100%, stroke: 0.5pt)
 ]
+#show line: set align(center)
 
-#let tag(body, color) = box(
-  stroke: 1pt + color,
+#let separator(length: 100%, stroke: .5pt, space: 1em) = block(
+  above: space,
+  below: space,
+  line(length: length, stroke: stroke),
+)
+
+#let section-separator = separator()
+#let subsection-separator = separator(length: 60%, stroke: .5pt + gray, space: 0.5em)
+
+
+#let tag(body) = box(
+  stroke: 0.5pt,
   radius: 1em,
   inset: (x: 0.5em, y: 0.25em),
 )[#text(size: 8pt)[#body]]
 
 #let tags(period) = {
   let items = (
-    period.at("skills", default: ()).map(s => tag(s, aqua))
-      + period.at("tech", default: ()).map(t => tag(t, purple))
+    period.at("skills", default: ()).map(s => tag(s)) + period.at("tech", default: ()).map(t => tag(t))
   )
   if items.len() > 0 {
     block(above: 0.4em)[#items.join(h(0.4em))]
   }
 }
 
-#let timerange(period) = text(size: 10pt, fill: gray.darken(20%))[
+#let timerange(period) = text(size: 10pt, fill: gray.darken(80%))[
   #period.at("delta", default: "") -- #period.at("year_span", default: "")
 ]
 
 // ------------------------ HEADER ------------------------
 
-#align(center)[
-  #text(size: 22pt, weight: "bold")[#about.name]
-  #v(0.2em)
-  #text(size: 14pt)[#about.title]
+#align(center)[#grid(
+    rows: (auto, auto),
+    inset: 5pt,
+    text(size: 25pt, weight: "bold")[#about.name],
+    text(size: 15pt)[#about.title],
+  )
+
 ]
 
 // ------------------------ ABOUT ------------------------
@@ -50,15 +62,19 @@
 #about.intro
 
 // ------------------------ LINKS ------------------------
-
+#section-separator
 #section-title("Links")
-- Email: #link("mailto:" + about.email)[#about.email]
-- Web: #link(about.web)[#about.web]
-- Github: #link(about.github)[#about.github]
-- Linkedin: #link(about.linkedin)[#about.linkedin]
+#grid(
+  rows: (auto, auto),
+  columns: (1fr, 1fr),
+  inset: 3pt,
+  text[Email: #link("mailto:" + about.email)[#about.email]], text[Web: #link(about.web)[#about.web]],
+  text[Github: #link(about.github)[#about.github]], text[Linkedin: #link(about.linkedin)[#about.linkedin]],
+)
 
 // ------------------------ WORK ------------------------
 
+#section-separator
 #section-title("Work")
 
 #for period in data.work.values().sorted(key: p => p.begin).rev() [
@@ -73,24 +89,23 @@
     #period.description
     #tags(period)
   ]
-  #line(length: 100%, stroke: 0.3pt + gray)
+  #subsection-separator
 ]
 
 // ------------------------ TRAINING ------------------------
-
+#section-separator
 #section-title("Training")
 
 #for period in data.training.values().sorted(key: p => p.begin).rev() [
   #block(above: 1em, below: 0.6em)[
-    #text(size: 12pt, weight: "bold")[#period.path]
+    #text(size: 12pt, weight: "bold")[#period.institution]
     #v(0.1em)
     #grid(
       columns: (1fr, auto),
-      text(size: 11pt, style: "italic")[#period.institution],
-      timerange(period),
+      text(size: 11pt, style: "italic")[#period.path], timerange(period),
     )
-    #v(0.3em)
+    #v(0.1em)
     #period.description
   ]
-  #line(length: 100%, stroke: 0.3pt + gray)
+  #subsection-separator
 ]
