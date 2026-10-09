@@ -1,8 +1,3 @@
-// Draft CV template, mirrors the outline of templates/resume.html.jinja:
-// header -> about -> links -> work -> training.
-// Reads resume.json, produced by export.py from the same parse.py data.
-// Not trimmed to one page yet.
-
 #let data = json("resume.json")
 #let about = data.about
 
@@ -19,25 +14,23 @@
 #let separator(length: 100%, stroke: .5pt, space: 1em) = block(
   above: space,
   below: space,
+  width: 100%,
   line(length: length, stroke: stroke),
 )
 
 #let section-separator = separator()
-#let subsection-separator = separator(length: 60%, stroke: .5pt + gray, space: 0.5em)
+#let subsection-separator = separator(length: 60%, stroke: .5pt + gray)
 
 
-#let tag(body) = box(
-  stroke: 0.5pt,
-  radius: 1em,
-  inset: (x: 0.5em, y: 0.25em),
-)[#text(size: 8pt)[#body]]
+#let tag(body) = box()[#text(size: 8pt)[#body]]
 
 #let tags(period) = {
   let items = (
     period.at("skills", default: ()).map(s => tag(s)) + period.at("tech", default: ()).map(t => tag(t))
   )
   if items.len() > 0 {
-    block(above: 0.4em)[#items.join(h(0.4em))]
+    // block(above: 0.4em, width: 100%, align(center, items.join(h(0.8em))))
+    block(above: 1em, items.join(h(0.8em)))
   }
 }
 
@@ -78,7 +71,7 @@
 #section-title("Work")
 
 #for period in data.work.values().sorted(key: p => p.begin).rev() [
-  #block(above: 1em, below: 0.6em)[
+  #block(above: 1em, below: 0.6em, breakable: false)[
     #text(size: 12pt, weight: "bold")[#period.title]
     #v(0.1em)
     #grid(
